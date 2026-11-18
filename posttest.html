@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 網頁基本設定與樣式載入 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 5: Post-Test | PhishGuard Academy</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- 頂部導覽列 -->
+    <nav class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <a href="index.html" class="font-extrabold text-xl text-cyan-400">🛡️ PhishGuard</a>
+            <div class="flex flex-wrap gap-4 text-xs font-bold">
+                <a href="index.html" class="text-slate-300 hover:text-white">Home</a>
+                <a href="pretest.html" class="text-slate-300 hover:text-white">1. Pre-Test</a>
+                <a href="guide.html" class="text-slate-300 hover:text-white">2. Guide</a>
+                <a href="lab.html" class="text-slate-300 hover:text-white">3. Email Lab</a>
+                <a href="detector.html" class="text-slate-300 hover:text-white">4. AI Detector</a>
+                <a href="posttest.html" class="text-cyan-400">5. Post-Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 後測單題測驗主容器 -->
+    <main class="max-w-3xl mx-auto px-4 py-12 flex-grow w-full">
+        <div class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-200">
+            <!-- 測驗標題與綠色進度條 -->
+            <div class="flex justify-between items-center pb-5 border-b border-slate-100 mb-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Module 5 • Final Evaluation</span>
+                    <h1 class="text-2xl font-extrabold text-slate-900 mt-1">Knowledge Post-Test</h1>
+                </div>
+                <div class="text-right">
+                    <span id="q-counter" class="text-sm font-extrabold text-slate-700">Question 1 of 4</span>
+                    <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden mt-1.5">
+                        <div id="q-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 動態渲染區（每次只顯示 1 題題目） -->
+            <div id="question-box" class="py-4"></div>
+
+            <!-- 上一題 / 下一題切換按鈕 -->
+            <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQ()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-bold text-sm hover:bg-slate-50">← Previous</button>
+                <button id="next-btn" onclick="nextQ()" class="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow">Next Question →</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 網站底部版權資訊 -->
+    <footer class="bg-slate-900 text-slate-400 text-center py-6 text-xs">CCIT4077 Cybersecurity Project • PhishGuard Academy</footer>
+
+    <!-- 後測單題切換、計分與跳轉電子證書頁邏輯 -->
+    <script>
+        // 確認受測者已填寫代號
+        if (!localStorage.getItem('pg_pid')) {
+            alert('Please enter your Nickname on the Home page first!');
+            window.location.href = 'index.html';
+        }
+
+        // 後測題庫（與前測對應，用於客觀衡量學習前後的 KPI 進步幅度）
+        const questions = [
+            { q: "Which email address is most likely a spoofed phishing sender?", options: ["support@apple.com", "security@app1e-support.com", "no-reply@://google.com"], ans: 1 },
+            { q: "What is the safest way to check where a hyperlink in an email leads?", options: ["Click it quickly and close the tab", "Hover your mouse over the link without clicking to preview the URL", "Forward it to a friend to test"], ans: 1 },
+            { q: "Why do phishing emails often threaten account suspension within 24 hours?", options: ["To create panic and rush you into making mistakes", "Because IT systems automatically delete accounts every day", "To save server storage"], ans: 0 },
+            { q: "What should you do if you receive an unexpected email asking for your student password?", options: ["Reply with your password so IT can fix the issue", "Report the email as phishing and never share your password", "Click the link and log in to check"], ans: 1 }
+        ];
+
+        let idx = 0;        // 目前題號索引
+        let answers = {};   // 儲存受測者選擇的答案
+
+        // 渲染目前題目的卡片畫面
+        function renderQ() {
+            const item = questions[idx];
+            document.getElementById('q-counter').innerText = 'Question ' + (idx + 1) + ' of ' + questions.length;
+            document.getElementById('q-bar').style.width = (((idx + 1) / questions.length) * 100) + '%';
+            document.getElementById('prev-btn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+            document.getElementById('next-btn').innerText = idx === questions.length - 1 ? 'Submit & View Certificate →' : 'Next Question →';
+
+            let html = '<h2 class="text-xl font-bold text-slate-900 mb-6">Q' + (idx + 1) + '. ' + item.q + '</h2><div class="space-y-3">';
+            for (let i = 0; i < item.options.length; i++) {
+                const checked = answers[idx] === i ? 'checked' : '';
+                const border = answers[idx] === i ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200 bg-slate-50';
+                html += '<label onclick="pick(' + i + ')" class="flex items-center gap-4 p-4 rounded-2xl border-2 ' + border + ' hover:border-emerald-400 cursor-pointer transition">';
+                html += '<input type="radio" name="opt" ' + checked + ' class="w-4 h-4 text-emerald-600">';
+                html += '<span class="text-sm md:text-base font-medium text-slate-800">' + item.options[i] + '</span></label>';
+            }
+            html += '</div>';
+            document.getElementById('question-box').innerHTML = html;
+        }
+
+        function pick(opt) { answers[idx] = opt; renderQ(); }
+        function prevQ() { if (idx > 0) { idx--; renderQ(); } }
+
+        // 翻下一題，或在答完最後一題後計算後測總分並跳轉至證書頁面 (certificate.html)
+        function nextQ() {
+            if (answers[idx] === undefined) { alert('Please select an answer first.'); return; }
+            if (idx < questions.length - 1) {
+                idx++; renderQ();
+            } else {
+                let correct = 0;
+                for (let i = 0; i < questions.length; i++) { if (answers[i] === questions[i].ans) correct++; }
+                const score = Math.round((correct / questions.length) * 100);
+                // 將後測成績存入 localStorage
+                localStorage.setItem('pg_post_score', score);
+                window.location.href = 'certificate.html';
+            }
+        }
+
+        // 初始化顯示第 1 題
+        renderQ();
+    </script>
+</body>
+</html>

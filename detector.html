@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 網頁基本設定與樣式載入 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4: AI Detector | PhishGuard Academy</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- 頂部導覽列 -->
+    <nav class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <a href="index.html" class="font-extrabold text-xl text-cyan-400">🛡️ PhishGuard</a>
+            <div class="flex flex-wrap gap-4 text-xs font-bold">
+                <a href="index.html" class="text-slate-300 hover:text-white">Home</a>
+                <a href="pretest.html" class="text-slate-300 hover:text-white">1. Pre-Test</a>
+                <a href="guide.html" class="text-slate-300 hover:text-white">2. Guide</a>
+                <a href="lab.html" class="text-slate-300 hover:text-white">3. Email Lab</a>
+                <a href="detector.html" class="text-cyan-400">4. AI Detector</a>
+                <a href="posttest.html" class="text-slate-300 hover:text-white">5. Post-Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- AI 釣魚風險偵測工具介面 -->
+    <main class="max-w-4xl mx-auto px-4 py-12 flex-grow w-full">
+        <div class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-200">
+            <!-- 工具標題與說明 -->
+            <div class="pb-6 border-b border-slate-100 mb-6">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Module 4 • Core Deliverable</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 mt-1">AI Phishing Risk Analyzer</h1>
+                <p class="text-sm text-slate-500 mt-1">Paste any suspicious email content or URL below to analyze its phishing risk score.</p>
+            </div>
+
+            <!-- 可疑電郵或網址輸入框與分析按鈕 -->
+            <textarea id="email-input" rows="4" placeholder="Paste suspicious email text or URL here (e.g., Urgent: Verify your account at http://bit.ly immediately)..." class="w-full p-4 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"></textarea>
+            <button onclick="analyzeEmail()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-7 py-3 rounded-xl transition shadow">Analyze Message Risk</button>
+            
+            <!-- 動態風險評估結果顯示區 -->
+            <div id="ai-result-box" class="hidden mt-6 p-5 rounded-2xl border"></div>
+
+            <!-- 頁面切換按鈕 -->
+            <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                <a href="lab.html" class="text-sm font-bold text-slate-500 hover:text-slate-800">← Previous Page</a>
+                <a href="posttest.html" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-7 py-3 rounded-xl transition shadow">Next Page: Final Post-Test →</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 網站底部版權資訊 -->
+    <footer class="bg-slate-900 text-slate-400 text-center py-6 text-xs">CCIT4077 Cybersecurity Project • PhishGuard Academy</footer>
+
+    <!-- 釣魚風險評分演算法原型（未來可直接替換為 fetch() 呼叫 Python AI 後端 API） -->
+    <script>
+        function analyzeEmail() {
+            const text = document.getElementById('email-input').value.trim();
+            const resultBox = document.getElementById('ai-result-box');
+            if (!text) { alert('Please paste email text or a URL first.'); return; }
+
+            // 常見社交工程恐嚇字眼與可疑網址特徵庫
+            const triggers = ['urgent', 'verify', 'suspended', 'password', 'bit.ly', 'http://', 'click here', 'bank', 'immediately', 'account', 'locked'];
+            let score = 12;     // 基礎風險分數
+            let matched = [];   // 儲存偵測到的高風險關鍵字
+
+            // 掃描輸入文字並累加風險指數
+            triggers.forEach(word => {
+                if (text.toLowerCase().includes(word)) { score += 18; matched.push(word); }
+            });
+            score = Math.min(score, 98); // 最高風險指數上限設為 98%
+
+            // 根據風險分數切換紅色高風險警告或綠色低風險提示
+            resultBox.classList.remove('hidden', 'bg-rose-50', 'border-rose-200', 'text-rose-900', 'bg-emerald-50', 'border-emerald-200', 'text-emerald-900');
+            if (score >= 50) {
+                resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-900');
+                resultBox.innerHTML = '<div class="font-extrabold text-base mb-1">🚨 High Phishing Risk Detected (' + score + '% Confidence)</div><p class="text-xs"><strong>Flagged Indicators:</strong> ' + matched.join(', ') + '</p>';
+            } else {
+                resultBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-900');
+                resultBox.innerHTML = '<div class="font-extrabold text-base mb-1">✅ Low Phishing Risk (' + score + '% Risk Score)</div><p class="text-xs">No high-risk keywords detected. Always verify sender domain manually.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

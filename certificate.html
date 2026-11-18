@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 網頁基本設定與樣式載入 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate | PhishGuard Academy</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- 頂部導覽列 -->
+    <nav class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="font-extrabold text-xl text-cyan-400">🛡️ PhishGuard</a>
+            <a href="index.html" class="text-xs font-bold text-slate-300 hover:text-white">Back to Home</a>
+        </div>
+    </nav>
+
+    <!-- 結業電子證書與 KPI 成績對比卡片 -->
+    <main class="max-w-3xl mx-auto px-4 py-12 flex-grow w-full">
+        <div class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-200">
+            <!-- 深色科技感電子證書外框 -->
+            <div class="p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 text-white border-2 border-cyan-500/40 shadow-xl">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">CCIT4077 Cybersecurity Initiative</span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold mt-1">Certificate of Completion</h1>
+                    </div>
+                    <span class="text-4xl">🏅</span>
+                </div>
+                <p class="text-slate-300 text-sm mb-1">Awarded to Participant:</p>
+                <div id="cert-name" class="text-3xl font-extrabold text-cyan-300 mb-6">Participant</div>
+                <!-- 動態顯示前測與後測分數對比結果 -->
+                <div id="summary-box" class="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 text-sm text-slate-200 leading-relaxed"></div>
+            </div>
+
+            <!-- 底部操作按鈕（返回首頁 或 列印/儲存為 PDF 證書） -->
+            <div class="mt-8 flex justify-between items-center">
+                <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-slate-800">← Return to Home</a>
+                <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">Print / Save Certificate</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 網站底部版權資訊 -->
+    <footer class="bg-slate-900 text-slate-400 text-center py-6 text-xs">CCIT4077 Cybersecurity Project • PhishGuard Academy</footer>
+
+    <!-- 計算並顯示學習前後進步百分比（對應計劃書 KPI 指標） -->
+    <script>
+        // 從 localStorage 讀取受測者代號、前測分數與後測分數
+        const pid = localStorage.getItem('pg_pid') || 'Guest Student';
+        const pre = localStorage.getItem('pg_pre_score');
+        const post = localStorage.getItem('pg_post_score');
+
+        document.getElementById('cert-name').innerText = pid;
+        const box = document.getElementById('summary-box');
+
+        // 計算前後測分數差額並顯示於證書上
+        if (pre !== null && post !== null) {
+            const diff = parseInt(post) - parseInt(pre);
+            const sign = diff >= 0 ? '+' : '';
+            box.innerHTML = 'Baseline Pre-Test Score: <strong class="text-white">' + pre + '%</strong><br>Final Post-Test Score: <strong class="text-emerald-400">' + post + '%</strong><br>Net Awareness Improvement: <strong class="text-cyan-400">' + sign + diff + '%</strong>';
+        } else if (post !== null) {
+            box.innerHTML = 'Final Post-Test Score: <strong class="text-emerald-400">' + post + '%</strong><br>(Complete the Pre-Test first to calculate your improvement percentage.)';
+        } else {
+            box.innerHTML = 'Please complete the Post-Test to view your official results.';
+        }
+    </script>
+</body>
+</html>

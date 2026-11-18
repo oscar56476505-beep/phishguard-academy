@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 網頁基本設定與可點擊熱點樣式 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3: Email Lab | PhishGuard Academy</title>
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        /* 模擬電郵內可點擊的可疑線索（未發現前顯示紅色虛線底線） */
+        .hotspot { cursor: pointer; transition: all 0.2s ease; border-bottom: 2px dashed #f43f5e; background: rgba(244, 63, 94, 0.08); padding: 2px 5px; border-radius: 4px; }
+        .hotspot:hover { background: rgba(244, 63, 94, 0.2); }
+        /* 受測者點擊發現線索後，轉為綠色高亮標記 */
+        .hotspot-found { background: rgba(16, 185, 129, 0.2) !important; border-bottom: 2px solid #10b981 !important; color: #065f46; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- 頂部導覽列 -->
+    <nav class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <a href="index.html" class="font-extrabold text-xl text-cyan-400">🛡️ PhishGuard</a>
+            <div class="flex flex-wrap gap-4 text-xs font-bold">
+                <a href="index.html" class="text-slate-300 hover:text-white">Home</a>
+                <a href="pretest.html" class="text-slate-300 hover:text-white">1. Pre-Test</a>
+                <a href="guide.html" class="text-slate-300 hover:text-white">2. Guide</a>
+                <a href="lab.html" class="text-cyan-400">3. Email Lab</a>
+                <a href="detector.html" class="text-slate-300 hover:text-white">4. AI Detector</a>
+                <a href="posttest.html" class="text-slate-300 hover:text-white">5. Post-Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 互動式釣魚電郵找碴沙盒 -->
+    <main class="max-w-4xl mx-auto px-4 py-12 flex-grow w-full">
+        <div class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-200">
+            <!-- 實驗室標題與線索計數器 -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 mb-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Module 3 • Hands-On Sandbox</span>
+                    <h1 class="text-2xl font-extrabold text-slate-900 mt-1">Spot the 3 Red Flags</h1>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 font-bold px-4 py-2 rounded-xl text-sm">
+                    🚩 Clues Found: <span id="flags-count" class="text-amber-600 text-lg">0</span> / 3
+                </div>
+            </div>
+
+            <p class="text-sm text-slate-600 mb-5">Click directly on the <strong>3 suspicious parts</strong> inside the email window below:</p>
+
+            <!-- 擬真網頁信箱視窗介面 -->
+            <div class="rounded-2xl border border-slate-300 overflow-hidden shadow-md bg-white">
+                <!-- 視窗頂部狀態列 -->
+                <div class="bg-slate-800 text-slate-300 px-4 py-2.5 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span class="ml-2 font-mono text-slate-400">Student Webmail Inbox</span>
+                    </div>
+                    <span class="bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-semibold">External Warning</span>
+                </div>
+                <!-- 電郵標頭區（線索 1：假冒拼錯字的寄件人網域） -->
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0">IT</div>
+                    <div class="text-sm space-y-1 w-full">
+                        <div><strong>From:</strong> IT Support Desk &lt;<span class="hotspot font-mono text-rose-700" onclick="foundFlag(this, 'Flag 1 (Spoofed Domain): hkuspace-suport.com misspells support and is NOT an official university domain.')">admin@hkuspace-suport.com</span>&gt;</div>
+                        <div class="text-xs text-slate-500">To: student@learner.hkuspace.hku.hk</div>
+                        <div class="font-bold text-slate-900 pt-1">Subject: URGENT: Your Student Portal Will Be Suspended in 2 Hours!</div>
+                    </div>
+                </div>
+                <!-- 電郵內文區（線索 2：2小時內刪除帳號的恐嚇語氣；線索 3：可疑短網址） -->
+                <div class="p-6 md:p-8 space-y-4 text-sm md:text-base text-slate-700 leading-relaxed">
+                    <p>Dear Student,</p>
+                    <p>Our system detected unauthorized login activity. <span class="hotspot" onclick="foundFlag(this, 'Flag 2 (Artificial Urgency): Threatening permanent account deletion within 2 hours creates panic to bypass rational checks.')">If you do not verify your password within 2 hours, your account and all files will be permanently deleted.</span></p>
+                    <p>Click below to verify immediately:</p>
+                    <p><span class="hotspot inline-block bg-blue-50 text-blue-700 font-mono text-sm px-4 py-2 rounded-lg border border-blue-200" onclick="foundFlag(this, 'Flag 3 (Suspicious Shortened URL): Official university IT never asks you to log in via unencrypted bit.ly links.')">http://bit.ly</span></p>
+                    <p class="text-slate-500 text-sm pt-2">Regards,<br>University IT Security Team</p>
+                </div>
+            </div>
+
+            <!-- 動態破綻解析提示框（點擊線索後顯示） -->
+            <div id="flag-feedback" class="hidden mt-5 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl text-sm font-medium"></div>
+
+            <!-- 頁面切換按鈕 -->
+            <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                <a href="guide.html" class="text-sm font-bold text-slate-500 hover:text-slate-800">← Previous Page</a>
+                <a href="detector.html" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-7 py-3 rounded-xl transition shadow">Next Page: AI Detector →</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 網站底部版權資訊 -->
+    <footer class="bg-slate-900 text-slate-400 text-center py-6 text-xs">CCIT4077 Cybersecurity Project • PhishGuard Academy</footer>
+
+    <!-- 互動找碴計數與解析顯示邏輯 -->
+    <script>
+        let flagsFound = 0; // 紀錄已找到的破綻數量
+
+        function foundFlag(element, explanation) {
+            // 避免重複點擊同一個已找到的線索導致重複計分
+            if (!element.classList.contains('hotspot-found')) {
+                element.classList.add('hotspot-found');
+                flagsFound++;
+                document.getElementById('flags-count').innerText = flagsFound;
+            }
+            // 顯示該破綻的資安解析說明
+            const box = document.getElementById('flag-feedback');
+            box.innerText = '💡 ' + explanation + (flagsFound === 3 ? ' 🎉 All 3 clues uncovered!' : '');
+            box.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
